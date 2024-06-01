@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:nad_flutter_notes_app/dialogs/note_dialog.dart';
 import 'package:nad_flutter_notes_app/services/firestore_service.dart';
 
@@ -29,30 +31,78 @@ class _MyHomePageState extends State<MyHomePage> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             List listaDeNotas = snapshot.data!.docs;
-            return ListView.builder(
-              itemCount: listaDeNotas.length,
-              itemBuilder: (context, idx) {
-                DocumentSnapshot documentSnapshot = listaDeNotas[idx];
-                String notaID = documentSnapshot.id;
-                Map<String, dynamic> dados =
-                    documentSnapshot.data() as Map<String, dynamic>;
-                String textoNota = dados['nota'];
-                return ListTile(
-                  title: Text(textoNota),
-                );
-              },
-            );
+            if (listaDeNotas.isEmpty) {
+              return const Align(
+                alignment: Alignment.topCenter,
+                child: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    'Ainda não foi registrada nota alguma... Aguardando!',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
+                      fontSize: 16,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 3,
+                  ),
+                ),
+              );
+            } else {
+              return Column(
+                children: [
+                  Align(
+                    alignment: Alignment.center,
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      color: Colors.blue[100],
+                      child: ListTile(
+                        title: Text(
+                          'Notas registradas: ${listaDeNotas.length}'
+                              .toUpperCase(),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blueAccent,
+                            fontSize: 20,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: listaDeNotas.length,
+                      itemBuilder: (context, idx) {
+                        DocumentSnapshot documentSnapshot = listaDeNotas[idx];
+                        String notaID = documentSnapshot.id;
+                        Map<String, dynamic> dados =
+                            documentSnapshot.data() as Map<String, dynamic>;
+                        String textoNota = dados['nota'];
+                        return ListTile(
+                          title: Text(textoNota),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              );
+            }
           } else {
             return const Align(
               alignment: Alignment.topCenter,
-              child: Text(
-                'Nenhuma nota cadastrada, ainda...',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.red,
-                  fontSize: 20,
+              child: Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  'Verificando se há notas registradas... Aguarde!',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
+                    fontSize: 16,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 3,
                 ),
-                textAlign: TextAlign.center,
               ),
             );
           }
